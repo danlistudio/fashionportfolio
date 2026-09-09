@@ -417,12 +417,45 @@
   .cleanup-btn svg{width:26px;height:26px;display:block;pointer-events:none}
   .cleanup-btn:active{transform:scale(.94)}
   @media (hover:hover) and (pointer:fine){.cleanup-btn:hover{background:#1d130b}}
-  @media(max-width:820px){.cleanup-btn{bottom:auto;top:14px;right:14px}}
+  @media(max-width:820px){.cleanup-btn{bottom:auto;top:72px;right:14px}}
+  /* ===== mobile nav (hamburger) + responsive fixes — appended override ===== */
+  .nav-toggle{display:none}
+  @media(max-width:820px){
+    .sidebar{overflow:visible;flex-wrap:nowrap}
+    .sidebar .brand{flex:none;white-space:nowrap}
+    .nav-toggle{display:flex;flex-direction:column;justify-content:center;gap:5px;
+      width:42px;height:42px;margin-left:auto;padding:9px;flex:none;
+      background:none;border:none;cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .nav-toggle span{display:block;width:100%;height:1.5px;background:var(--cream);border-radius:2px;
+      transition:transform .28s cubic-bezier(.23,1,.32,1),opacity .2s ease}
+    .sidebar.nav-open .nav-toggle span:nth-child(1){transform:translateY(6.5px) rotate(45deg)}
+    .sidebar.nav-open .nav-toggle span:nth-child(2){opacity:0}
+    .sidebar.nav-open .nav-toggle span:nth-child(3){transform:translateY(-6.5px) rotate(-45deg)}
+    .side-nav{
+      position:absolute;top:100%;left:0;right:0;
+      flex-direction:column;margin:0;gap:0;
+      background:var(--walnut);border-bottom:1px dashed var(--cork);
+      padding:4px 16px 12px;
+      max-height:calc(100vh - 60px);overflow-y:auto;
+      display:none;
+    }
+    .sidebar.nav-open .side-nav{display:flex}
+    .side-nav a{border-top:1px dashed var(--cork);padding:14px 2px;grid-template-columns:1fr;gap:0}
+    .side-nav a .lbl{font-size:12.5px;white-space:normal;letter-spacing:.1em}
+    /* resume: stack each entry, date above the role */
+    .res-item{grid-template-columns:1fr;gap:4px}
+    .res-item .when{order:-1}
+    /* about: keep the fixed-width portrait from overflowing the viewport */
+    .about{grid-template-columns:minmax(0,1fr);gap:30px}
+    .about-photo{width:100%}
+    .about .col{min-width:0}
+  }
 </style>
 
 <!-- ===================== SIDEBAR ===================== -->
 <aside class="sidebar">
   <a href="#top" class="brand">DAN LI<small>Portfolio</small></a>
+  <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false"><span></span><span></span><span></span></button>
   <nav class="side-nav">
     <div class="nav-group">
       <a href="#collections" data-nav="collections" class="has-sub"><span class="idx">01</span><span class="lbl">Design Collections <span class="caret">›</span></span></a>
@@ -988,5 +1021,18 @@
     }
     el.addEventListener('pointerup',end); el.addEventListener('pointercancel',end);
   });
+})();
+</script>
+
+<script>
+(function(){
+  var sb=document.querySelector('.sidebar'), tg=document.getElementById('navToggle');
+  if(!sb||!tg) return;
+  function setOpen(o){ sb.classList.toggle('nav-open',o); tg.setAttribute('aria-expanded', o?'true':'false'); tg.setAttribute('aria-label', o?'Close menu':'Open menu'); }
+  tg.addEventListener('click',function(e){ e.stopPropagation(); setOpen(!sb.classList.contains('nav-open')); });
+  sb.querySelectorAll('.side-nav a').forEach(function(a){ a.addEventListener('click',function(){ setOpen(false); }); });
+  document.addEventListener('click',function(e){ if(sb.classList.contains('nav-open') && !sb.contains(e.target)) setOpen(false); });
+  document.addEventListener('keydown',function(e){ if(e.key==='Escape') setOpen(false); });
+  window.addEventListener('resize',function(){ if(window.innerWidth>820) setOpen(false); });
 })();
 </script>
